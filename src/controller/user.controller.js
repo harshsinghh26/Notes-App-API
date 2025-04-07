@@ -13,7 +13,7 @@ const generateTokens = async (userId) => {
 
     user.refreshToken = refreshToken;
     user.save({ validateBeforeSave: false });
-    return accessToken, refreshToken;
+    return { accessToken, refreshToken };
   } catch (error) {
     throw new ApiError(500, 'Something went wrong while generating tokens!!');
   }
@@ -84,6 +84,9 @@ const userLogin = asyncHandler(async (req, res) => {
 
   const { accessToken, refreshToken } = await generateTokens(user._id);
 
+  //   console.log(accessToken);
+  //   console.log(refreshToken);
+
   const loggedInUser = await User.findById(user._id).select(
     '-password -refreshToken',
   );
@@ -97,7 +100,38 @@ const userLogin = asyncHandler(async (req, res) => {
     .status(200)
     .cookie('accessToken', accessToken, options)
     .cookie('refreshToken', refreshToken, options)
-    .json(new ApiResponse(200, loggedInUser, 'User Logged In Successfully!!'));
+    .json(
+      new ApiResponse(
+        200,
+        { user: loggedInUser, refreshToken, accessToken },
+        'User Logged In Successfully!!',
+      ),
+    );
 });
 
-export { userRegister, userLogin };
+// Logout
+
+const userLogout = asyncHandler(async (req, res) => {
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        refreshToken: undefined,
+      },
+    },
+    { new: true },
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .clearCookie('accessToken', options)
+    .clearCookie('refreshToken', options)
+    .json(new ApiResponse(200, {}, 'User Logged Out Successfully!!'));
+});
+
+export { userRegister, userLogin, userLogout };
