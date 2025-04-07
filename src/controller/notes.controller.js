@@ -62,4 +62,35 @@ const getNotesById = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, notes, 'Notes fetched Successfullu!!'));
 });
 
-export { createNotes, getNotes, getNotesById };
+// Update Notes
+
+const updateNotes = asyncHandler(async (req, res) => {
+  const { title, content, tags } = req.body;
+  const { id } = req.params;
+
+  if (!(title && content && tags)) {
+    throw new ApiError(400, 'All fields are required!!');
+  }
+
+  const newNotes = await Notes.findByIdAndUpdate(
+    id,
+    {
+      $set: {
+        title,
+        content,
+        tags,
+      },
+    },
+    { new: true },
+  );
+
+  if (!newNotes) {
+    throw new ApiError(500, 'Something went wrong while changing data!!');
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, newNotes, 'Notes Data Updated Successfully!!'));
+});
+
+export { createNotes, getNotes, getNotesById, updateNotes };
