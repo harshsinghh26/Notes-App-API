@@ -20,4 +20,8 @@ import Userrouter from './routes/user.routes.js';
 
 app.use('/api/v1/users', Userrouter);
 
+import Notesrouter from './routes/notes.routes.js';
+
+app.use('/api/v1/notes', Notesrouter);
+
 export default app;
