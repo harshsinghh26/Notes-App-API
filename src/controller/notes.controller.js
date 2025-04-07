@@ -93,4 +93,16 @@ const updateNotes = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, newNotes, 'Notes Data Updated Successfully!!'));
 });
 
-export { createNotes, getNotes, getNotesById, updateNotes };
+// Delete Notes
+
+const deleteNotes = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  await Notes.findByIdAndDelete(id);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, 'Data deleted Successfully!!'));
+});
+
+export { createNotes, getNotes, getNotesById, updateNotes, deleteNotes };
