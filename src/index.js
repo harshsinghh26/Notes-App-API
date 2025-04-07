@@ -1,6 +1,6 @@
 import app from './app.js';
 import dotenv from 'dotenv';
-import { asyncHandler } from './utils/AsyncHandler.js';
+// import { asyncHandler } from './utils/AsyncHandler.js';
 import dbConnection from './db/index.js';
 
 dotenv.config();
