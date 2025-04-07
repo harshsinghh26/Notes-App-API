@@ -9,7 +9,7 @@ const notesSchema = new Schema(
     content: {
       type: String,
     },
-    tag: {
+    tags: {
       type: String,
     },
     userId: {

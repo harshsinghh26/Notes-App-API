@@ -4,11 +4,18 @@ import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../utils/AsyncHandler.js';
 
-const createNotes = asyncHandler(async (req, res) => {
-  const { title, content, tags } = req.body;
-  const user = await User.findById(req.user._id);
+// Creating Notes
 
-  if ([title, content, tags].some((field) => field?.trim() == '')) {
+const createNotes = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user?._id);
+
+  if (!user) {
+    throw new ApiError(401, 'Unauthorize Access!!');
+  }
+
+  const { title, content, tags } = req.body;
+
+  if (!(title && content && tags)) {
     throw new ApiError(400, 'All fields are required!!');
   }
   const notes = await Notes.create({
@@ -33,4 +40,26 @@ const createNotes = asyncHandler(async (req, res) => {
     );
 });
 
-export { createNotes };
+// Get All Notes
+
+const getNotes = asyncHandler(async (req, res) => {
+  const notes = await Notes.find({ user: req.user?._id });
+  //   console.log(task);
+  return res
+    .status(200)
+    .json(new ApiResponse(200, notes, 'Notes fetched Successfully!!'));
+});
+
+// Get task by Id
+
+const getNotesById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const notes = await Notes.findById(id);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, notes, 'Notes fetched Successfullu!!'));
+});
+
+export { createNotes, getNotes, getNotesById };
