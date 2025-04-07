@@ -2,12 +2,20 @@ const asyncHandler = (fn) => async (req, res, next) => {
   try {
     await fn(req, res, next);
   } catch (error) {
-    res.status(error.code || 500).json({
+    res.status(error?.statusCode || 500).json({
       success: false,
-      message: error?.message || 'Somthing went Wrong!!',
+      message: error?.message || 'Internal Server Error!!',
       errors: error?.errors || [],
     });
   }
 };
 
 export { asyncHandler };
+
+// Another Methode
+
+// const asyncHandler = (requestHandler) => {
+//   return (req, res, next) => {
+//     Promise.resolve(requestHandler(req, res, next)).catch((err) => next(err));
+//   };
+// };
