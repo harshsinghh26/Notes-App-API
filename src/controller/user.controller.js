@@ -5,17 +5,20 @@ import { asyncHandler } from '../utils/AsyncHandler.js';
 
 // Genrate Token
 
-const generateTokens = async (userId) => {
+const generateAccessAndRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
-    const accessToken = user.createAccessToken();
+    const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
     user.refreshToken = refreshToken;
-    user.save({ validateBeforeSave: false });
+    await user.save({ validateBeforeSave: false });
     return { accessToken, refreshToken };
   } catch (error) {
-    throw new ApiError(500, 'Something went wrong while generating tokens!!');
+    throw new ApiError(
+      500,
+      'Something went wrong while genrating access token and refresh token',
+    );
   }
 };
 
@@ -82,10 +85,9 @@ const userLogin = asyncHandler(async (req, res) => {
     throw new ApiError(401, 'Invalid User Credentials!!');
   }
 
-  const { accessToken, refreshToken } = await generateTokens(user._id);
-
-  //   console.log(accessToken);
-  //   console.log(refreshToken);
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+    user._id,
+  );
 
   const loggedInUser = await User.findById(user._id).select(
     '-password -refreshToken',
