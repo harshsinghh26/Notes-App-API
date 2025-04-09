@@ -9,7 +9,7 @@ const generateTokens = async (userId) => {
   try {
     const user = await User.findById(userId);
     const accessToken = user.createAccessToken();
-    const refreshToken = user.createRefreshToken();
+    const refreshToken = user.generateRefreshToken();
 
     user.refreshToken = refreshToken;
     user.save({ validateBeforeSave: false });
